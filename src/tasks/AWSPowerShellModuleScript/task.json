@@ -121,6 +121,15 @@
             "defaultValue": "",
             "helpMarkDown": "The working directory where the script is run.",
             "groupName": "advanced"
+        },
+        {
+            "name": "skipAwsPowershellmoduleImport",
+            "type": "Skip AWSPowershell module import",
+            "label": "Ignore $LASTEXITCODE",
+            "required": false,
+            "defaultValue": "false",
+            "helpMarkDown": "If this is true, this pipeline step will not automatically download and import the AWSPowershell module.  This can save task execution time, however will require the AWS modules to manually be downloaded through script.",
+            "groupName": "advanced"
         }
     ],
     "execution": {

@@ -33,31 +33,37 @@ try {
 
     Assert-VstsPath -LiteralPath $tempDirectory -PathType 'Container'
 
-    # install the module if not present (we assume if present it is an an autoload-capable
-    # location)
-    Write-Host (Get-VstsLocString -Key 'TestingAWSModuleInstalled')
-    if (!(Get-Module -Name AWSPowerShell -ListAvailable)) {
-        Write-Host (Get-VstsLocString -Key 'AWSModuleNotFound')
+    # If the option is provided, we skip all steps related to the install ow the
+    # AWSPowerShell module
+    $skipModuleImport = Get-VstsInput -Name 'skipAwsPowershellmoduleImport' -AsBool
 
-        # AllowClobber is not available in Install-Module in the Hosted agent (but is in the
-        # Hosted 2017 agent). We always install/update the latest NuGet package
-        # provider to work around Install-Module on the Hosted agent also not having -Force and
-        # producing the error
-        #
-        # 'Exception calling “ShouldContinue” with “2” argument(s): “Windows PowerShell is in NonInteractive mode.'
-        #
-        Write-Host (Get-VstsLocString -Key 'InstallingAWSModule')
-        Install-PackageProvider -Name NuGet -Scope CurrentUser -Verbose -Force
-        $installModuleCmd = Get-Command Install-Module
-        if ($installModuleCmd.Parameters.ContainsKey("AllowClobber")) {
-            Install-Module -Name AWSPowerShell -Scope CurrentUser -Verbose -AllowClobber -Force
+    if(!$skipModuleImport){
+        # install the module if not present (we assume if present it is an an autoload-capable
+        # location)
+        Write-Host (Get-VstsLocString -Key 'TestingAWSModuleInstalled')
+        if (!(Get-Module -Name AWSPowerShell -ListAvailable)) {
+            Write-Host (Get-VstsLocString -Key 'AWSModuleNotFound')
+
+            # AllowClobber is not available in Install-Module in the Hosted agent (but is in the
+            # Hosted 2017 agent). We always install/update the latest NuGet package
+            # provider to work around Install-Module on the Hosted agent also not having -Force and
+            # producing the error
+            #
+            # 'Exception calling “ShouldContinue” with “2” argument(s): “Windows PowerShell is in NonInteractive mode.'
+            #
+            Write-Host (Get-VstsLocString -Key 'InstallingAWSModule')
+            Install-PackageProvider -Name NuGet -Scope CurrentUser -Verbose -Force
+            $installModuleCmd = Get-Command Install-Module
+            if ($installModuleCmd.Parameters.ContainsKey("AllowClobber")) {
+                Install-Module -Name AWSPowerShell -Scope CurrentUser -Verbose -AllowClobber -Force
+            }
+            else {
+                Install-Module -Name AWSPowerShell -Scope CurrentUser -Verbose -Force
+            }
         }
-        else {
-            Install-Module -Name AWSPowerShell -Scope CurrentUser -Verbose -Force
-        }
+
+        Import-Module -Name AWSPowerShell
     }
-
-    Import-Module -Name AWSPowerShell
 
     ###############################################################################
     # If credentials and/or region are not defined on the task we assume them to be
