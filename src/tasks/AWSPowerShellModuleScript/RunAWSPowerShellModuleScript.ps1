@@ -33,9 +33,9 @@ try {
 
     Assert-VstsPath -LiteralPath $tempDirectory -PathType 'Container'
 
-    # If the option is provided, we skip all steps related to the install ow the
+    # If the option is provided, we skip all steps related to the install of the
     # AWSPowerShell module
-    $skipModuleImport = Get-VstsInput -Name 'skipAwsPowershellmoduleImport' -AsBool
+    $skipModuleImport = Get-VstsInput -Name 'skipAwsPowershellModuleImport' -AsBool
 
     if(!$skipModuleImport){
         # install the module if not present (we assume if present it is an an autoload-capable
